@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Untukmu — Selamanya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400;1,700&family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;1,400;1,500&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --night:#050814;
+  --cosmos:#0a0f2e;
+  --nebula:#1a1040;
+  --gold:#e8c87a;
+  --gold2:#f5dfa0;
+  --rose:#c8617a;
+  --rose2:#e8889a;
+  --violet:#7c5cbf;
+  --star:#fff8e8;
+  --silver:#c8d4f0;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;cursor:none}
+
+/* CURSOR */
+.cursor{position:fixed;width:12px;height:12px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:transform .15s,width .3s,height .3s,opacity .3s;mix-blend-mode:screen}
+.cursor-trail{position:fixed;width:32px;height:32px;border:1px solid rgba(232,200,122,.35);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform .35s,left .12s,top .12s;mix-blend-mode:screen}
+
+body{
+  font-family:'EB Garamond',serif;
+  background:var(--night);
+  color:var(--silver);
+  overflow-x:hidden;
+}
+
+/* ══ LOCK SCREEN ══ */
+#lock{
+  position:fixed;inset:0;z-index:9000;
+  background:var(--night);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  transition:opacity 1.2s ease,visibility 1.2s;
+}
+#lock.gone{opacity:0;visibility:hidden;pointer-events:none}
+.lock-inner{text-align:center;position:relative;z-index:2}
+.lock-moon{font-size:4rem;margin-bottom:1.5rem;filter:drop-shadow(0 0 30px rgba(232,200,122,.6));animation:moonFloat 4s ease-in-out infinite}
+@keyframes moonFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-14px) rotate(5deg)}}
+.lock-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,3vw,1.9rem);color:var(--gold);letter-spacing:6px;margin-bottom:.6rem;text-transform:uppercase}
+.lock-sub{font-family:'EB Garamond',serif;font-style:italic;font-size:1.15rem;color:var(--silver);opacity:.7;margin-bottom:2.8rem;letter-spacing:2px}
+.lock-btn{
+  position:relative;
+  font-family:'Cinzel Decorative',serif;
+  font-size:.85rem;letter-spacing:5px;
+  text-transform:uppercase;
+  color:var(--night);
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border:none;padding:1rem 2.8rem;
+  border-radius:2px;cursor:none;
+  overflow:hidden;
+  transition:transform .3s,box-shadow .3s;
+  box-shadow:0 0 40px rgba(232,200,122,.3);
+}
+.lock-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);
+  transform:translateX(-100%);transition:transform .6s;
+}
+.lock-btn:hover{transform:scale(1.04);box-shadow:0 0 60px rgba(232,200,122,.5)}
+.lock-btn:hover::before{transform:translateX(100%)}
+
+/* STAR BG on lock */
+#lock canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* ══ MAIN ══ */
+main{position:relative}
+
+/* ══ CANVAS STARS ══ */
+#star-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;width:100%;height:100%}
+
+/* ══ SECTION HERO ══ */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;z-index:1;overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 30%, rgba(124,92,191,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(200,97,122,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 20%, rgba(232,200,122,.08) 0%, transparent 60%);
+}
+.hero-moon{
+  position:absolute;top:8%;right:10%;
+  width:clamp(140px,18vw,240px);
+  height:clamp(140px,18vw,240px);
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #fffae0 0%, #f5dfa0 40%, #c9a830 70%, #7a5e10 100%);
+  box-shadow:0 0 80px rgba(232,200,122,.35),0 0 160px rgba(232,200,122,.15);
+  animation:moonPulse 6s ease-in-out infinite;
+  z-index:0;
+}
+.hero-moon::after{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 60% 30%, rgba(255,255,255,.15) 0%, transparent 50%),
+             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Ccircle cx='60' cy='80' r='18' fill='rgba(0,0,0,.06)'/%3E%3Ccircle cx='150' cy='50' r='12' fill='rgba(0,0,0,.05)'/%3E%3Ccircle cx='100' cy='160' r='22' fill='rgba(0,0,0,.06)'/%3E%3Ccircle cx='190' cy='130' r='14' fill='rgba(0,0,0,.04)'/%3E%3C/svg%3E");
+}
+@keyframes moonPulse{0%,100%{box-shadow:0 0 80px rgba(232,200,122,.35),0 0 160px rgba(232,200,122,.15)}50%{box-shadow:0 0 100px rgba(232,200,122,.5),0 0 200px rgba(232,200,122,.2)}}
+
+.hero-eyebrow{
+  position:relative;z-index:1;
+  font-family:'Cinzel Decorative',serif;
+  font-size:.65rem;letter-spacing:8px;
+  text-transform:uppercase;color:var(--gold);
+  opacity:0;animation:fadeUp .7s ease .3s forwards;
+  margin-bottom:1.8rem;
+}
+.hero-line-dec{
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:1.2rem;
+  margin:0 auto 1rem;max-width:320px;
+  opacity:0;animation:fadeUp .7s ease .4s forwards;
+}
+.hero-line-dec span{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold))}
+.hero-line-dec span:last-child{background:linear-gradient(to left,transparent,var(--gold))}
+.hero-line-dec em{color:var(--gold);font-style:normal;font-size:1rem}
+
+.hero-script{
+  position:relative;z-index:1;
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(1.4rem,3vw,2rem);
+  color:var(--rose2);letter-spacing:3px;
+  opacity:0;animation:fadeUp .8s ease .5s forwards;
+  margin-bottom:.5rem;
+}
+.hero-names{
+  position:relative;z-index:1;
+  font-family:'Bodoni Moda',serif;
+  font-style:italic;
+  font-size:clamp(3.5rem,10vw,8.5rem);
+  line-height:.95;
+  color:var(--star);
+  opacity:0;animation:fadeUp 1s ease .65s forwards;
+  letter-spacing:-1px;
+}
+.hero-names .amp{
+  font-family:'Dancing Script',cursive;
+  font-size:.55em;color:var(--gold);
+  font-style:normal;vertical-align:middle;
+  margin:0 .2em;
+}
+.hero-since{
+  position:relative;z-index:1;
+  font-size:.8rem;letter-spacing:7px;
+  text-transform:uppercase;color:var(--violet);
+  opacity:0;animation:fadeUp .8s ease .9s forwards;
+  margin-top:1.2rem;
+}
+.scroll-hint{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  z-index:1;display:flex;flex-direction:column;align-items:center;gap:.6rem;
+  opacity:0;animation:fadeUp .8s ease 1.4s forwards;
+}
+.scroll-hint span{font-size:.6rem;letter-spacing:5px;text-transform:uppercase;color:var(--gold);opacity:.6}
+.scroll-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);
+  animation:scrollBounce 2s ease-in-out infinite;
+}
+@keyframes scrollBounce{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(12px);opacity:1}}
+
+/* COUNTDOWN */
+.countdown-section{
+  position:relative;z-index:1;
+  padding:5rem 2rem;
+  text-align:center;
+}
+.section-tag{font-family:'Cinzel Decorative',serif;font-size:.6rem;letter-spacing:7px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;display:block}
+.section-title{font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(1.8rem,4vw,3rem);color:var(--star);margin-bottom:3rem}
+.countdown-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:1.5rem;max-width:600px;margin:0 auto;
+}
+.cd-box{
+  background:rgba(232,200,122,.06);
+  border:1px solid rgba(232,200,122,.18);
+  border-radius:8px;padding:1.5rem .5rem;
+  backdrop-filter:blur(8px);
+}
+.cd-num{
+  font-family:'Bodoni Moda',serif;
+  font-size:clamp(2rem,5vw,3.2rem);
+  color:var(--gold);line-height:1;
+  text-shadow:0 0 30px rgba(232,200,122,.4);
+}
+.cd-label{font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--silver);opacity:.6;margin-top:.5rem}
+@media(max-width:480px){.countdown-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ══ LETTER SECTION ══ */
+.letter-section{
+  position:relative;z-index:1;
+  max-width:780px;margin:0 auto;
+  padding:5rem 2rem;
+}
+.letter-paper{
+  background:rgba(232,200,122,.04);
+  border:1px solid rgba(232,200,122,.14);
+  border-radius:4px;
+  padding:4rem clamp(2rem,5vw,5rem);
+  position:relative;
+  backdrop-filter:blur(12px);
+}
+.letter-paper::before{
+  content:'';position:absolute;inset:12px;
+  border:1px solid rgba(232,200,122,.07);
+  border-radius:2px;pointer-events:none;
+}
+.letter-corner{
+  position:absolute;width:24px;height:24px;
+  border-color:var(--gold);border-style:solid;opacity:.5;
+}
+.lc-tl{top:8px;left:8px;border-width:1px 0 0 1px}
+.lc-tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.lc-bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.lc-br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+
+.letter-date{font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:2rem;display:block}
+.letter-greeting{font-family:'Dancing Script',cursive;font-size:clamp(1.8rem,4vw,2.5rem);color:var(--rose2);margin-bottom:1.5rem}
+.letter-body{font-style:italic;font-size:1.12rem;line-height:2;color:var(--silver);opacity:.9}
+.letter-body p{margin-bottom:1.2rem}
+.letter-body em{color:var(--gold2);font-style:normal}
+.letter-sign{font-family:'Dancing Script',cursive;font-size:1.8rem;color:var(--gold);margin-top:2rem;display:block;text-align:right}
+
+/* ══ GALLERY / TIMELINE ══ */
+.timeline-section{position:relative;z-index:1;padding:5rem 2rem;max-width:1100px;margin:0 auto}
+.timeline-line{
+  position:absolute;left:50%;top:0;bottom:0;
+  width:1px;background:linear-gradient(to bottom,transparent,rgba(232,200,122,.25) 10%,rgba(232,200,122,.25) 90%,transparent);
+  transform:translateX(-50%);
+}
+.tl-item{
+  display:grid;grid-template-columns:1fr 80px 1fr;
+  align-items:center;gap:0;
+  margin-bottom:4rem;
+}
+.tl-item:nth-child(odd) .tl-card{grid-column:1;grid-row:1;text-align:right}
+.tl-item:nth-child(odd) .tl-dot{grid-column:2;grid-row:1}
+.tl-item:nth-child(odd) .tl-photo{grid-column:3;grid-row:1}
+.tl-item:nth-child(even) .tl-photo{grid-column:1;grid-row:1}
+.tl-item:nth-child(even) .tl-dot{grid-column:2;grid-row:1}
+.tl-item:nth-child(even) .tl-card{grid-column:3;grid-row:1;text-align:left}
+
+.tl-dot{
+  display:flex;align-items:center;justify-content:center;
+  z-index:2;
+}
+.tl-dot-inner{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 20px rgba(232,200,122,.6);
+  position:relative;
+}
+.tl-dot-inner::before{
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid rgba(232,200,122,.4);
+  animation:dotPulse 2.5s ease-in-out infinite;
+}
+@keyframes dotPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.3);opacity:1}}
+
+.tl-photo{
+  border-radius:8px;overflow:hidden;
+  aspect-ratio:4/5;
+  background:var(--nebula);
+  display:flex;align-items:center;justify-content:center;
+  font-size:3.5rem;
+  border:1px solid rgba(232,200,122,.12);
+  max-width:280px;
+  transition:transform .5s,box-shadow .5s;
+  position:relative;
+}
+.tl-photo img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0}
+.tl-item:nth-child(odd) .tl-photo{margin-left:auto;margin-right:0}
+.tl-item:nth-child(even) .tl-photo{margin-right:auto;margin-left:0}
+.tl-photo:hover{transform:scale(1.03);box-shadow:0 20px 60px rgba(200,97,122,.25)}
+
+.tl-card{padding:1.5rem 1.8rem}
+.tl-num{font-size:.6rem;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:.8rem;display:block}
+.tl-caption{font-family:'Bodoni Moda',serif;font-style:italic;font-size:1.18rem;color:var(--star);line-height:1.6;margin-bottom:.8rem}
+.tl-sub{font-size:.85rem;color:var(--rose2);letter-spacing:1px}
+
+@media(max-width:680px){
+  .timeline-line{left:20px}
+  .tl-item,.tl-item:nth-child(even),.tl-item:nth-child(odd){
+    grid-template-columns:40px 1fr;
+    grid-template-rows:auto auto;
+  }
+  .tl-dot,.tl-item:nth-child(odd) .tl-dot,.tl-item:nth-child(even) .tl-dot{grid-column:1;grid-row:1}
+  .tl-photo,.tl-item:nth-child(odd) .tl-photo,.tl-item:nth-child(even) .tl-photo{grid-column:2;grid-row:1;max-width:100%;margin:0}
+  .tl-card,.tl-item:nth-child(odd) .tl-card,.tl-item:nth-child(even) .tl-card{grid-column:1/-1;grid-row:2;text-align:left}
+}
+
+/* ══ LOVE REASONS ══ */
+.reasons-section{
+  position:relative;z-index:1;
+  padding:5rem 2rem;max-width:900px;margin:0 auto;
+  text-align:center;
+}
+.reasons-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:1.5rem;margin-top:3rem;
+}
+.reason-card{
+  background:rgba(10,15,46,.6);
+  border:1px solid rgba(232,200,122,.13);
+  border-radius:12px;padding:2rem 1.6rem;
+  text-align:left;
+  backdrop-filter:blur(12px);
+  transition:transform .4s,border-color .4s,box-shadow .4s;
+  opacity:0;transform:translateY(30px);
+}
+.reason-card.visible{opacity:1;transform:translateY(0);transition:opacity .6s ease var(--delay,.1s),transform .6s ease var(--delay,.1s),box-shadow .4s,border-color .4s}
+.reason-card:hover{
+  transform:translateY(-6px) !important;
+  border-color:rgba(232,200,122,.35);
+  box-shadow:0 20px 50px rgba(200,97,122,.18);
+}
+.reason-icon{font-size:1.8rem;margin-bottom:1rem}
+.reason-num{font-size:.6rem;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:.6rem;display:block}
+.reason-text{font-style:italic;font-size:1.05rem;line-height:1.7;color:var(--silver)}
+.reason-text strong{color:var(--gold2);font-style:normal;font-weight:400}
+
+/* ══ PROMISE RING SECTION ══ */
+.promise-section{
+  position:relative;z-index:1;
+  padding:8rem 2rem;text-align:center;
+  overflow:hidden;
+}
+.promise-glow{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:600px;height:600px;
+  background:radial-gradient(ellipse, rgba(124,92,191,.2) 0%,transparent 70%);
+  pointer-events:none;animation:glowPulse 5s ease-in-out infinite;
+}
+@keyframes glowPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.15)}}
+.promise-ring{
+  width:200px;height:200px;border-radius:50%;
+  border:2px solid rgba(232,200,122,.4);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 3rem;
+  position:relative;
+  animation:ringRotate 20s linear infinite;
+}
+.promise-ring::before{
+  content:'';position:absolute;inset:8px;border-radius:50%;
+  border:1px solid rgba(200,97,122,.3);
+}
+.promise-ring::after{
+  content:'✦';font-size:1.4rem;color:var(--gold);
+  position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  animation:ringRotate 20s linear infinite reverse;
+}
+.ring-inner{
+  width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,rgba(232,200,122,.4),rgba(124,92,191,.3));
+  border:1px solid rgba(232,200,122,.3);
+  font-size:2.5rem;
+  display:flex;align-items:center;justify-content:center;
+  animation:ringRotate 20s linear infinite reverse;
+}
+@keyframes ringRotate{to{transform:rotate(360deg)}}
+.promise-words{font-family:'Bodoni Moda',serif;font-style:italic;font-size:clamp(1.5rem,4vw,2.6rem);color:var(--star);line-height:1.5;max-width:640px;margin:0 auto}
+.promise-words em{color:var(--rose2);font-style:normal;display:block}
+
+/* ══ STARS MUSIC PLAYER ══ */
+#player{
+  position:fixed;bottom:2rem;left:2rem;z-index:500;
+  display:flex;align-items:center;gap:1rem;
+  background:rgba(5,8,20,.85);
+  border:1px solid rgba(232,200,122,.25);
+  border-radius:50px;padding:.75rem 1.4rem;
+  backdrop-filter:blur(16px);
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+  transition:opacity .3s;
+}
+#player-btn{
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid var(--gold);
+  background:rgba(232,200,122,.12);
+  color:var(--gold);
+  cursor:none;display:flex;align-items:center;justify-content:center;
+  font-size:1rem;transition:background .3s,transform .2s;flex-shrink:0;
+}
+#player-btn:hover{background:rgba(232,200,122,.25);transform:scale(1.1)}
+.player-disc{
+  width:36px;height:36px;border-radius:50%;
+  background:conic-gradient(var(--rose) 0deg 90deg,var(--gold) 90deg 180deg,var(--violet) 180deg 270deg,var(--rose2) 270deg 360deg);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.player-disc::after{content:'';width:12px;height:12px;border-radius:50%;background:var(--night)}
+#player.playing .player-disc{animation:spin 6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.player-info{display:flex;flex-direction:column;gap:.2rem}
+.player-title{font-size:.72rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;white-space:nowrap}
+.player-status{font-size:.6rem;letter-spacing:1px;color:var(--silver);opacity:.6}
+
+/* ══ CLOSING ══ */
+.closing-section{
+  position:relative;z-index:1;
+  padding:8rem 2rem 6rem;text-align:center;
+  background:linear-gradient(to bottom,transparent,rgba(124,92,191,.08) 40%,rgba(200,97,122,.06));
+}
+.closing-big{
+  font-family:'Bodoni Moda',serif;font-style:italic;
+  font-size:clamp(3rem,8vw,7rem);
+  color:var(--star);line-height:1.1;margin-bottom:1rem;
+}
+.closing-big span{color:var(--gold)}
+.closing-script{
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(2rem,5vw,3.5rem);
+  color:var(--rose2);margin-bottom:2rem;
+}
+.closing-sub{font-style:italic;font-size:1.1rem;color:var(--silver);opacity:.7;letter-spacing:3px;margin-bottom:3rem}
+.heart-row{display:flex;justify-content:center;align-items:center;gap:2rem;font-size:1.8rem;animation:heartbeat 2s ease-in-out infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.footer-note{
+  margin-top:4rem;font-size:.65rem;
+  letter-spacing:5px;text-transform:uppercase;
+  color:var(--gold);opacity:.4;
+}
+
+/* ══ DIVIDERS ══ */
+.cosmic-div{
+  text-align:center;padding:1rem;
+  color:var(--gold);font-size:.8rem;letter-spacing:2rem;
+  opacity:.35;
+}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-28px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ SHOOTING STARS ══ */
+.shooting-star{
+  position:fixed;
+  width:2px;height:2px;
+  background:white;
+  border-radius:50%;
+  pointer-events:none;z-index:0;
+}
+.shooting-star::after{
+  content:'';position:absolute;right:2px;top:0;
+  width:80px;height:1px;
+  background:linear-gradient(to left,rgba(255,255,255,.9),transparent);
+  transform-origin:right center;
+}
+
+/* ══ NEBULA DECORATIONS ══ */
+.nebula-dec{
+  position:absolute;border-radius:50%;
+  filter:blur(80px);pointer-events:none;z-index:0;
+}
+.nebula-1{width:500px;height:400px;background:rgba(124,92,191,.12);top:-100px;left:-100px}
+.nebula-2{width:400px;height:350px;background:rgba(200,97,122,.08);bottom:0;right:-80px}
+
+/* scroll reveal generic */
+.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursor-trail"></div>
+
+<!-- ══ LOCK SCREEN ══ -->
+<div id="lock">
+  <canvas id="lock-stars"></canvas>
+  <div class="lock-inner">
+    <div class="lock-moon">🌙</div>
+    <h1 class="lock-title">Khusus Untukmu</h1>
+    <p class="lock-sub">sebuah ruang di antara bintang-bintang</p>
+    <button class="lock-btn" onclick="openLetter()">Buka Suratmu ✦</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<canvas id="star-canvas"></canvas>
+
+<main>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-moon"></div>
+
+  <p class="hero-eyebrow">✦ &nbsp; Dari Semesta Untukmu &nbsp; ✦</p>
+  <div class="hero-line-dec reveal" style="opacity:0;animation:scaleIn .9s ease .5s forwards">
+    <span></span><em>✦</em><span></span>
+  </div>
+  <p class="hero-script">untuk kamu yang paling kusayang,</p>
+  <h1 class="hero-names">
+    Mahendra<br><span class="amp">&amp;</span><br>Asha
+  </h1>
+  <p class="hero-since">Bersama &nbsp;·&nbsp; Selamanya &nbsp;·&nbsp; Sepenuh Hati</p>
+
+  <div class="scroll-hint">
+    <span>Gulir</span>
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<div class="cosmic-div">✦ &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ✦</div>
+
+<!-- ══ COUNTDOWN ══ -->
+<section class="countdown-section">
+  <span class="section-tag">✦ Waktu Kita</span>
+  <h2 class="section-title reveal">Sudah Berapa Lama Kita Bersama</h2>
+  <div class="countdown-grid reveal">
+    <div class="cd-box"><div class="cd-num" id="cd-years">0</div><div class="cd-label">Tahun</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-months">0</div><div class="cd-label">Bulan</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-days">0</div><div class="cd-label">Hari</div></div>
+    <div class="cd-box"><div class="cd-num" id="cd-hours">0</div><div class="cd-label">Jam</div></div>
+  </div>
+  <p style="margin-top:1.5rem;font-style:italic;color:var(--rose2);opacity:.8;font-size:.95rem" class="reveal">
+    — dan setiap detiknya terasa berharga —
+  </p>
+</section>
+
+<div class="cosmic-div">✦ &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ✦</div>
+
+<!-- ══ LETTER ══ -->
+<section class="letter-section">
+  <div class="letter-paper reveal">
+    <div class="letter-corner lc-tl"></div>
+    <div class="letter-corner lc-tr"></div>
+    <div class="letter-corner lc-bl"></div>
+    <div class="letter-corner lc-br"></div>
+    <span class="letter-date">Di bawah langit malam yang penuh bintang</span>
+    <p class="letter-greeting">Sayang,</p>
+    <div class="letter-body">
+      <p>Ada hal-hal yang sulit diucapkan dengan kata-kata biasa, makanya aku tulis ini — di sini, di antara bintang-bintang yang selalu kita lihat bersama.</p>
+      <p>Kamu tahu tidak? Setiap kali aku melihatmu, ada rasa yang tidak pernah bisa aku jelaskan dengan sempurna. Seperti semesta tiba-tiba memiliki arti. Seperti setiap hari yang pernah aku jalani <em>akhirnya punya tujuan</em>.</p>
+      <p>Mencintaimu bukan hanya soal perasaan — ini soal pilihan yang aku buat setiap pagi saat aku bangun, setiap malam saat aku memejamkan mata, dan di setiap momen di antara keduanya.</p>
+      <p>Aku tidak berjanji untuk sempurna. Tapi aku berjanji untuk <em>selalu hadir</em>, selalu mencoba, dan selalu memilihmu — hari demi hari, tahun demi tahun, selamanya.</p>
+      <p>Terima kasih sudah menjadi rumah terhangat yang pernah aku kenal.</p>
+    </div>
+    <span class="letter-sign">Dengan segenap cinta, selalu — ♡</span>
+  </div>
+</section>
+
+<div class="cosmic-div">✦ &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ✦</div>
+
+<!-- ══ TIMELINE GALLERY ══ -->
+<section class="timeline-section">
+  <div class="timeline-line"></div>
+  <div style="text-align:center;margin-bottom:4rem">
+    <span class="section-tag">✦ Kenangan Kita</span>
+    <h2 class="section-title reveal">Perjalanan Cinta Kita</h2>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 01 —</span>
+      <p class="tl-caption">"Di antara banyaknya manusia, semesta mempertemukanku denganmu."</p>
+      <p class="tl-sub">~ kau semestaku</p>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-photo reveal">
+      <img src="image/a.jpeg" alt="Momen 01" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='🌸'"/>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-photo reveal">
+      <img src="image/b.jpeg" alt="Momen 02" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='✨'"/>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 02 —</span>
+      <p class="tl-caption">"Jika waktu berhenti, aku ingin berhenti di momen ini bersamamu."</p>
+      <p class="tl-sub">~ momen terindah</p>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 03 —</span>
+      <p class="tl-caption">"Bukan tentang seberapa lama kita bersama, tapi seberapa dalam kita saling menjaga."</p>
+      <p class="tl-sub">~ terasa nyaman</p>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-photo reveal">
+      <img src="image/c.jpeg" alt="Momen 03" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='🌙'"/>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-photo reveal">
+      <img src="image/d.jpeg" alt="Momen 04" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='💫'"/>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 04 —</span>
+      <p class="tl-caption">"Di setiap senyumku, selalu ada kamu di baliknya."</p>
+      <p class="tl-sub">~ Matamu bicara</p>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 05 —</span>
+      <p class="tl-caption">"Di sisimu, aku menemukan tempat paling nyaman di seluruh dunia."</p>
+      <p class="tl-sub">~ Rumahku adalah dirimu</p>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-photo reveal">
+      <img src="image/e.jpeg" alt="Momen 05" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='🌟'"/>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-photo reveal">
+      <img src="image/f.jpeg" alt="Momen 06" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='🌺'"/>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 06 —</span>
+      <p class="tl-caption">"Kamu adalah jawaban dari setiap doa yang pernah aku panjatkan."</p>
+      <p class="tl-sub">~ Jawaban doaku</p>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 07 —</span>
+      <p class="tl-caption">"Setiap jalan yang kita tempuh bersama adalah petualangan terbaik dalam hidupku."</p>
+      <p class="tl-sub">~ Bersama melangkah</p>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-photo reveal">
+      <img src="image/g.jpeg" alt="Momen 07" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='💕'"/>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-photo reveal">
+      <img src="image/h.jpeg" alt="Momen 08" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='🌙'"/>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 08 —</span>
+      <p class="tl-caption">"Pertemuan di saat rasa cinta yang begitu besar — cinta ini tak tertahankan."</p>
+      <p class="tl-sub">~ cinta ini</p>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 09 —</span>
+      <p class="tl-caption">"Di dalam pelukmu, aku menemukan kedamaian yang tak ternilai harganya."</p>
+      <p class="tl-sub">~ Dalam dekapanmu</p>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-photo reveal">
+      <img src="image/i.jpeg" alt="Momen 09" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='✦'"/>
+    </div>
+  </div>
+
+  <div class="tl-item">
+    <div class="tl-photo reveal">
+      <img src="image/j.jpeg" alt="Momen 10" onerror="this.style.display='none';this.parentNode.style.fontSize='3.5rem';this.parentNode.textContent='💖'"/>
+    </div>
+    <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+    <div class="tl-card reveal">
+      <span class="tl-num">— Momen 10 —</span>
+      <p class="tl-caption">"Cinta terbesar adalah memilihmu setiap hari — tanpa ragu, tanpa syarat, dan tanpa akhir."</p>
+      <p class="tl-sub">~ Selalu dan selamanya</p>
+    </div>
+  </div>
+
+</section>
+
+<div class="cosmic-div">✦ &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ✦</div>
+
+<!-- ══ REASONS ══ -->
+<section class="reasons-section">
+  <span class="section-tag">✦ Mengapa Aku Mencintaimu</span>
+  <h2 class="section-title reveal">10 Alasan yang Tak Terhitung</h2>
+  <div class="reasons-grid">
+    <div class="reason-card" style="--delay:.05s">
+      <div class="reason-icon">🌙</div>
+      <span class="reason-num">— 01 —</span>
+      <p class="reason-text">Caramu <strong>tertawa</strong> — yang membuat seluruh ruangan ikut bersinar.</p>
+    </div>
+    <div class="reason-card" style="--delay:.1s">
+      <div class="reason-icon">✦</div>
+      <span class="reason-num">— 02 —</span>
+      <p class="reason-text">Bagaimana kamu tetap <strong>kuat</strong> di saat-saat yang paling sulit sekalipun.</p>
+    </div>
+    <div class="reason-card" style="--delay:.15s">
+      <div class="reason-icon">🌹</div>
+      <span class="reason-num">— 03 —</span>
+      <p class="reason-text">Kehangatan yang kamu bawa setiap kali kamu <strong>ada di dekatku</strong>.</p>
+    </div>
+    <div class="reason-card" style="--delay:.2s">
+      <div class="reason-icon">💫</div>
+      <span class="reason-num">— 04 —</span>
+      <p class="reason-text">Cara pandangmu yang selalu membuat hal biasa terasa <strong>luar biasa</strong>.</p>
+    </div>
+    <div class="reason-card" style="--delay:.25s">
+      <div class="reason-icon">🌟</div>
+      <span class="reason-num">— 05 —</span>
+      <p class="reason-text">Kamu adalah orang yang paling <strong>jujur dan tulus</strong> yang pernah aku kenal.</p>
+    </div>
+    <div class="reason-card" style="--delay:.3s">
+      <div class="reason-icon">🌸</div>
+      <span class="reason-num">— 06 —</span>
+      <p class="reason-text">Cara kamu <strong>memahami aku</strong> bahkan sebelum aku selesai bicara.</p>
+    </div>
+    <div class="reason-card" style="--delay:.35s">
+      <div class="reason-icon">💕</div>
+      <span class="reason-num">— 07 —</span>
+      <p class="reason-text">Pelukanmu yang terasa seperti <strong>pulang ke rumah</strong> setelah perjalanan panjang.</p>
+    </div>
+    <div class="reason-card" style="--delay:.4s">
+      <div class="reason-icon">🌙</div>
+      <span class="reason-num">— 08 —</span>
+      <p class="reason-text">Cara kamu <strong>peduli</strong> pada orang-orang di sekitarmu dengan sepenuh hati.</p>
+    </div>
+    <div class="reason-card" style="--delay:.45s">
+      <div class="reason-icon">✨</div>
+      <span class="reason-num">— 09 —</span>
+      <p class="reason-text">Kamu membuatku ingin menjadi <strong>versi terbaik</strong> dari diri sendiri.</p>
+    </div>
+    <div class="reason-card" style="--delay:.5s">
+      <div class="reason-icon">💖</div>
+      <span class="reason-num">— 10 —</span>
+      <p class="reason-text">Karena kamu adalah <strong>kamu</strong> — dan tidak ada yang lebih istimewa dari itu.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cosmic-div">✦ &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp; ✦</div>
+
+<!-- ══ PROMISE ══ -->
+<section class="promise-section">
+  <div class="promise-glow"></div>
+  <div class="promise-ring reveal">
+    <div class="ring-inner">💍</div>
+  </div>
+  <p class="promise-words reveal">
+    Aku berjanji untuk mencintaimu
+    <em>hari ini, esok, dan selamanya</em>
+    — tanpa syarat, tanpa akhir, sepenuh jiwa.
+  </p>
+</section>
+
+<!-- ══ CLOSING ══ -->
+<section class="closing-section">
+  <span class="section-tag">✦ Dari Hatiku Yang Terdalam</span>
+  <h2 class="closing-big reveal">
+    Aku <span>Mencintai</span>mu
+  </h2>
+  <p class="closing-script reveal">Kemarin. Hari ini. Selamanya.</p>
+  <p class="closing-sub reveal">— dengan segenap jiwa dan raga —</p>
+  <div class="heart-row reveal">
+    <span>💕</span><span>🌙</span><span>✦</span><span>🌙</span><span>💕</span>
+  </div>
+  <p class="footer-note">Dibuat dengan Cinta · Untuk Kamu Seorang</p>
+</section>
+
+</main>
+
+<!-- MUSIC PLAYER -->
+<div id="player">
+  <button id="player-btn" onclick="toggleMusic()">▶</button>
+  <div class="player-disc"></div>
+  <div class="player-info">
+    <span class="player-title">Lagu Kita</span>
+    <span class="player-status" id="player-status">Klik untuk memutar</span>
+  </div>
+</div>
+
+<audio id="bg-music" loop preload="auto">
+  <source src="image/musik.mp3" type="audio/mpeg"/>
+</audio>
+
+<script>
+// ══ LOCK SCREEN STARS ══
+(function(){
+  const c=document.getElementById('lock-stars'),ctx=c.getContext('2d');
+  c.width=window.innerWidth;c.height=window.innerHeight;
+  const stars=Array.from({length:200},()=>({
+    x:Math.random()*c.width,y:Math.random()*c.height,
+    r:Math.random()*1.5+.3,
+    a:Math.random(),da:(.005+Math.random()*.01)*(Math.random()>.5?1:-1)
+  }));
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a+=s.da;
+      if(s.a>1||s.a<0)s.da*=-1;
+      ctx.globalAlpha=Math.max(0,s.a);
+      ctx.fillStyle='#fff';
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ══ OPEN LETTER ══
+function openLetter(){
+  const audio=document.getElementById('bg-music');
+  audio.volume=0.5;
+  audio.play().catch(()=>{});
+  document.getElementById('player').classList.add('playing');
+  document.getElementById('player-btn').textContent='⏸';
+  document.getElementById('player-status').textContent='Sedang diputar...';
+  document.getElementById('lock').classList.add('gone');
+}
+
+// ══ BACKGROUND STARS ══
+(function(){
+  const c=document.getElementById('star-canvas'),ctx=c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=document.body.scrollHeight||window.innerHeight*5}
+  resize();
+  window.addEventListener('resize',resize);
+  const stars=Array.from({length:350},()=>({
+    x:Math.random()*c.width,y:Math.random()*c.height,
+    r:Math.random()*1.8+.2,
+    a:Math.random()*.8+.2,
+    da:(.003+Math.random()*.008)*(Math.random()>.5?1:-1)
+  }));
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    stars.forEach(s=>{
+      s.a+=s.da;if(s.a>1||s.a<.1)s.da*=-1;
+      ctx.globalAlpha=s.a;
+      ctx.fillStyle='#fff8e8';
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  // resize after content loads
+  setTimeout(resize,500);
+})();
+
+// ══ SHOOTING STARS ══
+(function(){
+  function shoot(){
+    const el=document.createElement('div');
+    el.className='shooting-star';
+    const startX=Math.random()*window.innerWidth;
+    const startY=Math.random()*window.innerHeight*.5;
+    const angle=Math.random()*30+15;
+    el.style.cssText=`left:${startX}px;top:${startY}px;transform:rotate(${angle}deg);z-index:0;opacity:1;transition:all 1.2s linear`;
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.left=(startX+300)+'px';
+      el.style.top=(startY+150)+'px';
+      el.style.opacity='0';
+    });
+    setTimeout(()=>el.remove(),1300);
+    setTimeout(shoot,Math.random()*4000+3000);
+  }
+  setTimeout(shoot,2000);
+})();
+
+// ══ COUNTDOWN ══
+(function(){
+  // ★ GANTI TANGGAL ANNIVERSARY DI SINI (YYYY, MM-1, DD)
+  const start=new Date(2023,0,15); // contoh: 15 Januari 2023
+  function update(){
+    const now=new Date();
+    let y=now.getFullYear()-start.getFullYear();
+    let m=now.getMonth()-start.getMonth();
+    let d=now.getDate()-start.getDate();
+    let h=now.getHours();
+    if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate()}
+    if(m<0){y--;m+=12}
+    document.getElementById('cd-years').textContent=String(y).padStart(2,'0');
+    document.getElementById('cd-months').textContent=String(m).padStart(2,'0');
+    document.getElementById('cd-days').textContent=String(d).padStart(2,'0');
+    document.getElementById('cd-hours').textContent=String(h).padStart(2,'0');
+  }
+  update();setInterval(update,60000);
+})();
+
+// ══ MUSIC ══
+(function(){
+  const audio=document.getElementById('bg-music');
+  const btn=document.getElementById('player-btn');
+  const player=document.getElementById('player');
+  const status=document.getElementById('player-status');
+  window.toggleMusic=function(){
+    if(audio.paused){
+      audio.play();
+      btn.textContent='⏸';
+      player.classList.add('playing');
+      status.textContent='Sedang diputar...';
+    } else {
+      audio.pause();
+      btn.textContent='▶';
+      player.classList.remove('playing');
+      status.textContent='Dijeda';
+    }
+  };
+})();
+
+// ══ CUSTOM CURSOR ══
+(function(){
+  const cur=document.getElementById('cursor');
+  const trail=document.getElementById('cursor-trail');
+  let mx=0,my=0,tx=0,ty=0;
+  document.addEventListener('mousemove',e=>{
+    mx=e.clientX;my=e.clientY;
+    cur.style.left=mx+'px';cur.style.top=my+'px';
+  });
+  function animTrail(){
+    tx+=(mx-tx)*.15;ty+=(my-ty)*.15;
+    trail.style.left=tx+'px';trail.style.top=ty+'px';
+    requestAnimationFrame(animTrail);
+  }
+  animTrail();
+  document.addEventListener('mousedown',()=>cur.style.transform='translate(-50%,-50%) scale(.6)');
+  document.addEventListener('mouseup',()=>cur.style.transform='translate(-50%,-50%) scale(1)');
+})();
+
+// ══ SCROLL REVEAL ══
+(function(){
+  const els=document.querySelectorAll('.reveal,.reason-card');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}
+    });
+  },{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(el=>obs.observe(el));
+})();
+</script>
+</body>
+</html>
